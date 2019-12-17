@@ -1,0 +1,50 @@
+ROSTemplateFormatVersion: '2015-09-01'
+Transform: 'Aliyun::Serverless-2018-04-03'
+Resources:
+  fc-python-web:
+    Type: 'Aliyun::Serverless::Service'
+    Properties:
+      Description: 'wsgi web application run in fc'
+    flask-demo:
+      Type: 'Aliyun::Serverless::Function'
+      Properties:
+        Handler: index.handler
+        Runtime: python3
+        CodeUri: './flaskApp'
+      Events:
+        httpTrigger:
+          Type: HTTP
+          Properties:
+            AuthType: ANONYMOUS
+            Methods: ['POST', 'GET', 'HEAD', 'PUT', 'DELETE']
+    django-demo:
+      Type: 'Aliyun::Serverless::Function'
+      Properties:
+        Handler: index.handler
+        Runtime: python3
+        CodeUri: './djangoApp'
+      Events:
+        httpTrigger:
+          Type: HTTP
+          Properties:
+            AuthType: ANONYMOUS
+            Methods: ['POST', 'GET', 'HEAD', 'PUT', 'DELETE']
+  
+  flask.mydomain.cn:
+    Type: 'Aliyun::Serverless::CustomDomain'
+    Properties:
+      Protocol: HTTP
+      RouteConfig:
+        Routes: 
+          '/*':
+            ServiceName: fc-python-web
+            FunctionName: flask-demo
+  django.mydomain.cn:
+    Type: 'Aliyun::Serverless::CustomDomain'
+    Properties:
+      Protocol: HTTP
+      RouteConfig:
+        Routes: 
+          '/*':
+            ServiceName: fc-python-web
+            FunctionName: django-demo
